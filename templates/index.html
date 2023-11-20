@@ -31,9 +31,9 @@
 </head>
 <body>
     <form method="post" action="{{ url_for('volume_deck') }}">
-        <label for="codice_otp">Inserisci il codice OTP:</label>
+        <label for="codice_otp">Enter the OTP code:</label>
         <input type="number" pattern="[0-9]*" inputmode="numeric" id="codice_otp" name="codice_otp" required>
-        <button type="submit">Verifica OTP</button>
+        <button type="submit">Verify OTP</button>
     </form>
 </body>
 </html>
