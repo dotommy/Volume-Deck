@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #0e1a22;
+        }
+
+        header{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 20vh;
+        }
+
+        .container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 80vh;
+        }
+
+        .container_process{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: -30%;
+            width: 50%;
+            height: 50%;
+        }
+
+        input[type=range]{
+        margin-top: -50%;
+        transform: rotate(270deg);
+        border-style: solid;
+        border-width: 5px;
+        border-color: white;
+        margin-top:50%;
+        display: flex;
+        }
+
+    </style>
+    <title>Volume Deck</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        var serverIP = '{{ server_ip }}';
+        $.ajax({
+                type: 'GET',
+                url: 'http://'+ serverIP +':5000/get_volume',
+                success: function(data) {
+                    // La risposta dalla richiesta GET contiene il valore del volume
+                    var volume_now = data.volume_now;
+
+                    $('#slider').val(volume_now);
+                    console.log(data)
+                    console.log("Volume corrente:", volume_now);
+                    // Puoi fare qualcos'altro con il valore del volume qui
+                },
+                error: function(error) {
+                    console.error('Errore nella richiesta GET:', error);
+                }
+            });
+    </script>
+</head>
+<body>
+
+<header><h1>VOLUME DECK</h1></header>
+<div class="container">
+    <div class="container_process">
+        <h2>Chrome</h2>
+        <input type="range" id="slider" min="0" max="100" step="10" value="0">
+    </div>
+</div>
+
+
+<script>
+
+// Ottieni l'elemento dello slider
+var slider = document.getElementById('slider');
+// Aggiungi un listener per l'evento di cambio valore
+slider.addEventListener('input', function() {
+    // Ottieni il valore dello slider
+    var valoreSlider = slider.value;
+
+    // Crea un oggetto JSON con il valore dello slider
+    var datiJSON = {
+        volume: valoreSlider
+    };
+
+    console.log("Valore dello slider:", valoreSlider); // Aggiungi questa riga di debug
+    // Esegui una richiesta AJAX POST
+    $.ajax({
+        type: "POST",
+        url: "http://" + serverIP + ":5000/set_volume",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(datiJSON),
+        success: function (risposta) {
+            console.log("Dati inviati con successo:", risposta);
+        },
+        error: function (errore) {
+            console.error("Errore nell'invio dei dati:", errore);
+        }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+    body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0e1a22;
+    }
+
+
+    form {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-left: 10vw;
+        margin-right: 10vw;
+        gap: 10px;
+    }
+    </style>
+    <title>Volume Deck</title>
+</head>
+<body>
+    <form method="post" action="{{ url_for('volume_deck') }}">
+        <label for="codice_otp">Inserisci il codice OTP:</label>
+        <input type="number" pattern="[0-9]*" inputmode="numeric" id="codice_otp" name="codice_otp" required>
+        <button type="submit">Verifica OTP</button>
+    </form>
+</body>
+</html>

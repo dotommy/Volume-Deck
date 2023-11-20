@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #0e1a22;
+        }
+
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 10vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            align-items: center;
+            row-gap: 5%;
+            width: 100vw;
+            height: 80vh;
+        }
+
+        .buttons{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            height: 10vh;
+            width: 100vw;
+            
+        }
+
+        .container_process {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: -30%;
+            height: 100vh;
+            width: 30vw;
+        }
+
+        input[type=range] {
+            margin-top: -50%;
+            transform: rotate(270deg);
+            border-style: solid;
+            border-width: 5px;
+            border-color: white;
+            margin-top: 50%;
+            display: flex;
+        }
+
+        /* Nascondi i div extra */
+        .hidden {
+            display: none;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            margin-left: 10px;
+            margin-right: 10px;
+            gap: 20px;
+        }
+
+        @media only screen and (max-width: 600px) {
+        .container_process {
+            height: 100vh;
+            width: 100vw;
+        }}
+    </style>
+    <title>Volume Deck</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        var serverIP = '{{ server_ip }}';
+        var currentIndex = 0; // Indice del div corrente
+
+        $.ajax({
+            type: 'GET',
+            url: 'http://' + serverIP + ':5000/get_process',
+            success: function (data) {
+                var responseData = data;
+                console.log(data);
+                for (var i = 0; i < responseData.process.length; i++) {
+                    var containerDiv = $('<div>').addClass('container_process').attr('id', 'container_process_' + i);
+                    var h2Element = $('<h2>').text(responseData.process[i]);
+                    containerDiv.append(h2Element);
+
+                    var inputElement = $('<input>').attr({
+                        type: 'range',
+                        class: 'slider', // Usa una classe comune per tutti gli slider
+                        id: 'slider_' + i,
+                        min: 0,
+                        max: 100,
+                        step: 10,
+                        value: responseData.volume_now[i]
+                    });
+                    containerDiv.append(inputElement);
+
+                    $('.container').append(containerDiv);
+
+                    // Aggiungi la classe "hidden" a tutti i div tranne il primo
+                    if (i > 0) {
+                        containerDiv.addClass('hidden');
+                    }
+
+                    // Aggiungi il listener per l'evento di cambio valore all'interno del ciclo
+                    inputElement.on('input', function () {
+                        var valoreSlider = $(this).val();
+                        var id = $(this).attr('id').replace('slider_', '');
+
+                        var datiJSON = {
+                            volume: valoreSlider
+                        };
+
+                        console.log("Valore dello slider:", valoreSlider);
+                        $.ajax({
+                            type: "POST",
+                            url: "http://" + serverIP + ":5000/set_volume" + id,
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(datiJSON),
+                            success: function (risposta) {
+                                console.log("Dati inviati con successo:", risposta);
+                            },
+                            error: function (errore) {
+                                console.error("Errore nell'invio dei dati:", errore);
+                            }
+                        });
+                    });
+                    
+            
+                }
+                var currentIndex_ = 0;
+                var numeroDiDiv = $('.container').find('.container_process').length;
+                MaxcurrentIndex_ = numeroDiDiv
+                console.log(MaxcurrentIndex_);
+
+                // Gestione del clic sulla freccia destra
+                $('#nextBtn').on('click', function () {
+                    if (currentIndex_ != MaxcurrentIndex_ - 1) {
+                        $('#container_process_' + currentIndex_).addClass('hidden');
+                        currentIndex_++;
+                        $('#container_process_' + currentIndex_).removeClass('hidden');
+                        if (currentIndex_ === MaxcurrentIndex_ - 1) {
+                            $('#nextBtn').prop('disabled', true);
+                        }
+                        if (currentIndex_ != 0) {
+                            $('#prevBtn').prop('disabled', false);
+                        }
+                        console.log(currentIndex_);
+                        console.log(MaxcurrentIndex_ - 1);
+                    }
+                });
+                // Gestione del clic sulla freccia destra
+                $('#prevBtn').on('click', function () {
+                    if (currentIndex_ != 0 ) {
+                        $('#container_process_' + currentIndex_).addClass('hidden');
+                        currentIndex_--;
+                        $('#container_process_' + currentIndex_).removeClass('hidden');
+                        if (currentIndex_ === 0) {
+                            $('#prevBtn').prop('disabled', true);
+                        }
+                        if (currentIndex_ != MaxcurrentIndex_ - 1) {
+                            $('#nextBtn').prop('disabled', false);
+                        }
+                        console.log(currentIndex_);
+                        console.log(MaxcurrentIndex_ - 1);
+                    }
+                });
+            },
+            error: function (error) {
+                console.error('Errore nella richiesta GET:', error);
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <header>
+        <h1>VOLUME DECK</h1>
+    </header>
+    <div class="container"></div>
+    <div class="buttons">
+        <button disabled id="prevBtn">←</button>
+        <button id="nextBtn">→</button>
+    </div>
+</body>
+</html>
