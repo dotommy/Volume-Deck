@@ -2,7 +2,7 @@
 
 Official repository for Volume Deck, an open-source project dedicated to intuitive management of software audio volumes through a web interface. This tool simplifies sound level control directly from your browser, eliminating the need to navigate through the native settings of each application.
 
-Key Features:
+# Key Features:
 
 Accessible Web Interface: Conveniently access Volume Deck's web interface using your device's local IP address. Effortlessly control sound levels from any computer connected to your network.
 
